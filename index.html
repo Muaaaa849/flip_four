@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <meta name="theme-color" content="#141A3A" />
+    <link rel="icon" href="data:," />
+    <title>Flip Four</title>
+  </head>
+  <body>
+    <canvas id="stage"></canvas>
+    <div id="turn" class="glass"><span class="dot"></span><span class="label">赤の番</span></div>
+    <button id="mute" class="glass" type="button" aria-label="音のオン/オフ">♪</button>
+    <div id="mode" class="glass" role="group" aria-label="操作の切り替え">
+      <button type="button" data-mode="drop" class="active">落とす</button>
+      <button type="button" data-mode="flip">反転</button>
+    </div>
+    <div id="result" hidden>
+      <div class="glass panel">
+        <p class="label"></p>
+        <button id="again" class="glass" type="button">もう一度</button>
+      </div>
+    </div>
+    <pre id="debug" hidden></pre>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
