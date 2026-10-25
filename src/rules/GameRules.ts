@@ -6,6 +6,9 @@ export const ROWS = 6;
 /** R = 赤（先手）、B = 青 */
 export type Player = 'R' | 'B';
 
+/** 1ゲームで反転できる回数。先手の有利を減らすため、後手を1回多くする */
+export const FLIP_LIMIT: Readonly<Record<Player, number>> = { R: 2, B: 3 };
+
 export type Action = { type: 'drop'; col: number } | { type: 'flip'; col: number };
 
 /** [列, 段]。段 0 が底 */
@@ -17,6 +20,8 @@ export interface State {
   /** 列ごとの玉。底から上への順に並ぶ（常に底へ詰まっている） */
   cols: Player[][];
   turn: Player;
+  /** 反転の残り回数 */
+  flipsLeft: Record<Player, number>;
   /** 直前の手（相手が指した手） */
   lastAction: Action | null;
   result: Result | null;
@@ -26,6 +31,7 @@ export function createState(): State {
   return {
     cols: Array.from({ length: COLS }, () => []),
     turn: 'R',
+    flipsLeft: { ...FLIP_LIMIT },
     lastAction: null,
     result: null,
   };
@@ -38,7 +44,7 @@ export function canDrop(s: State, col: number): boolean {
 }
 
 export function canFlip(s: State, col: number): boolean {
-  if (s.result !== null || s.cols[col].length < 2) return false;
+  if (s.result !== null || s.cols[col].length < 2 || s.flipsLeft[s.turn] < 1) return false;
   const last = s.lastAction;
   return !(last?.type === 'flip' && last.col === col);
 }
@@ -57,12 +63,18 @@ export function apply(s: State, action: Action): State {
   if (!ok) throw new Error(`指せない手です: ${action.type}(${action.col})`);
 
   const cols = s.cols.map((c) => [...c]);
-  if (action.type === 'drop') cols[action.col].push(s.turn);
-  else cols[action.col].reverse();
+  const flipsLeft = { ...s.flipsLeft };
+  if (action.type === 'drop') {
+    cols[action.col].push(s.turn);
+  } else {
+    cols[action.col].reverse();
+    flipsLeft[s.turn] -= 1;
+  }
 
   return {
     cols,
     turn: other(s.turn),
+    flipsLeft,
     lastAction: action,
     result: judge(cols, s.turn),
   };

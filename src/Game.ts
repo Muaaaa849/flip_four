@@ -32,6 +32,7 @@ export class Game {
     };
     hud.onMode = (mode) => {
       if (this.locked || this.state.result) return;
+      if (mode === 'flip' && this.state.flipsLeft[this.state.turn] < 1) return;
       this.mode = mode;
       this.refresh();
     };
@@ -120,6 +121,7 @@ export class Game {
   private refresh() {
     this.hud.setTurn(this.state.turn);
     this.hud.setMode(this.mode);
+    this.hud.setFlipsLeft(this.state.flipsLeft[this.state.turn]);
     this.hud.setLocked(this.locked);
     const dimming = this.mode === 'flip' && !this.locked;
     for (let col = 0; col < COLS; col++) {

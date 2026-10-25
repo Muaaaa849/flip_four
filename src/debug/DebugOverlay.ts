@@ -55,7 +55,7 @@ export class DebugOverlay {
     const result = s.result ? (s.result.kind === 'draw' ? 'draw' : `win ${s.result.winner}`) : '-';
     this.pre.innerHTML = [
       `fps ${this.fps.toFixed(1)}`,
-      `turn ${s.turn}  result ${result}`,
+      `turn ${s.turn}  result ${result}  flips R${s.flipsLeft.R} B${s.flipsLeft.B}`,
       `locked ${this.game.locked}  audio ${this.sound.state}  hits ${this.game.hitCount}`,
       `<span id="debug-board">${this.game.boardText()}</span>`,
       settle,

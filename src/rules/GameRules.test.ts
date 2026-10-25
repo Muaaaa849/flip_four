@@ -83,6 +83,37 @@ describe('GameRules: 反転', () => {
   });
 });
 
+describe('GameRules: 反転の回数制限', () => {
+  it('反転の残り回数は 赤2・青3 から始まる', () => {
+    expect(createState().flipsLeft).toEqual({ R: 2, B: 3 });
+  });
+
+  it('反転すると、指した側の残り回数だけが1減る', () => {
+    const s = apply(stateWith([['R', 'B']]), flip(0));
+    expect(s.flipsLeft).toEqual({ R: 1, B: 3 });
+    expect(apply(s, drop(3)).flipsLeft).toEqual({ R: 1, B: 3 });
+  });
+
+  it('残り回数が0なら反転できない（相手は反転できる）', () => {
+    const s: State = { ...stateWith([['R', 'B'], ['B', 'R']]), flipsLeft: { R: 0, B: 1 } };
+    expect(canFlip(s, 0)).toBe(false);
+    expect(legalActions(s).filter((a) => a.type === 'flip')).toEqual([]);
+    expect(() => apply(s, flip(0))).toThrow();
+    expect(canFlip({ ...s, turn: 'B' }, 0)).toBe(true);
+  });
+
+  it('赤は3回目の反転ができない', () => {
+    // 赤と青が交互に反転し、赤が2回使い切る
+    let s = stateWith([['R', 'B'], ['B', 'R'], ['R', 'B']]);
+    s = apply(s, flip(0)); // 赤 1回目
+    s = apply(s, flip(1)); // 青
+    s = apply(s, flip(2)); // 赤 2回目
+    s = apply(s, flip(0)); // 青
+    expect(s.flipsLeft).toEqual({ R: 0, B: 1 });
+    expect(canFlip(s, 1)).toBe(false);
+  });
+});
+
 describe('GameRules: 勝ちの判定', () => {
   it('縦の4つで勝つ', () => {
     const s = play(drop(0), drop(1), drop(0), drop(1), drop(0), drop(1), drop(0));

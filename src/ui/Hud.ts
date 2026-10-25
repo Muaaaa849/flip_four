@@ -39,6 +39,13 @@ export class Hud {
     }
   }
 
+  /** 手番の人の反転の残り回数。0 ならボタンを暗くする */
+  setFlipsLeft(n: number) {
+    const b = this.mode.querySelector<HTMLButtonElement>('[data-mode="flip"]')!;
+    b.textContent = `反転 あと${n}`;
+    b.classList.toggle('empty', n < 1);
+  }
+
   setLocked(locked: boolean) {
     this.mode.classList.toggle('locked', locked);
   }
